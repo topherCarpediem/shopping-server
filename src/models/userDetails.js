@@ -1,7 +1,7 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('useraddress', {
+export default (sequelize, DataTypes) => {
+  const UserDetails =  sequelize.define('user_details', {
     address_id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -47,15 +47,15 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: false
     },
-    user_id: {
-      type: DataTypes.INTEGER(11),
-      allowNull: false,
-      references: {
-        model: 'users',
-        key: 'user_id'
-      }
+    card_id: {
+      type: DataTypes.STRING,
+      allowNull: false
     }
-  }, {
-    tableName: 'useraddress'
   });
+
+  return UserDetails
+
+  
+
+  
 };

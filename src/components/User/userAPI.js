@@ -19,7 +19,6 @@ User.post('/register', sanitizeRegisterBody, async (req, res) => {
     const emailAddress = req.body.emailAddress;
 
     isUserExist(emailAddress).then(result => {
-
         return result === null ? true : false
     }).then(isUnique => {
         if (!isUnique) {

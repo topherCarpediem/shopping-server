@@ -1,11 +1,12 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('category', {
-    category_id: {
-      type: DataTypes.INTEGER(11),
-      allowNull: false,
-      primaryKey: true
+export default (sequelize, DataTypes) => {
+  const Category = sequelize.define('category', {
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false
     },
     name: {
       type: DataTypes.STRING(255),
@@ -23,7 +24,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER(11),
       allowNull: true
     }
-  }, {
-    tableName: 'category'
   });
+
+  return Category
 };

@@ -1,7 +1,11 @@
-/* jshint indent: 2 */
-
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('users', {
+export default (sequelize, DataTypes) => {
+  const User = sequelize.define('users', {
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false
+    },
     firstName: {
       type: DataTypes.STRING(45),
       allowNull: false,
@@ -21,11 +25,12 @@ module.exports = function(sequelize, DataTypes) {
     password: {
       type: DataTypes.STRING(255),
       allowNull: false
-    },
-    cardId: {
-      type: DataTypes.STRING(45),
-      allowNull: true,
-      field: "card_id",
     }
   })
+
+  User.associate = (models) => {
+    User.hasOne(models.UserDetails)
+  }
+
+  return User;
 };

@@ -1,11 +1,13 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('product', {
-    product_id: {
-      type: DataTypes.INTEGER(11),
-      allowNull: false,
-      primaryKey: true
+export default (sequelize, DataTypes) => {
+  
+  const Product =  sequelize.define('product', {  
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false
     },
     product_name: {
       type: DataTypes.STRING(255),
@@ -42,24 +44,20 @@ module.exports = function(sequelize, DataTypes) {
     isActive: {
       type: DataTypes.INTEGER(4),
       allowNull: false
-    },
-    category_id: {
-      type: DataTypes.INTEGER(11),
-      allowNull: false,
-      references: {
-        model: 'category',
-        key: 'category_id'
-      }
-    },
-    user_id: {
-      type: DataTypes.INTEGER(11),
-      allowNull: false,
-      references: {
-        model: 'users',
-        key: 'user_id'
-      }
     }
-  }, {
-    tableName: 'product'
-  });
+  })
+
+  Product.associate = (models) => {
+    Product.belongsTo(models.User)
+  }
+
+  Product.associate = (models) => {
+    Product.belongsTo(models.Category)
+  }
+
+  
+
+  return Product
+
+  
 };
