@@ -15,7 +15,8 @@ export default (sequelize, DataTypes) => {
   });
 
   Cart.associate = (models) => {
-    Cart.hasMany(models.Product)
+    Cart.belongsTo(models.Product)
+    Cart.belongsTo(models.User)
   }
 
   return Cart

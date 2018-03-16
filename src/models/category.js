@@ -18,7 +18,7 @@ export default (sequelize, DataTypes) => {
     },
     header: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: true
     },
     parentCategory: {
       type: DataTypes.INTEGER(11),

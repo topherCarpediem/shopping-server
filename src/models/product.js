@@ -9,51 +9,44 @@ export default (sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       allowNull: false
     },
-    product_name: {
+    productName: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: false,
+      field: "product_name",
     },
-    product_price: {
+    productPrice: {
       type: "DOUBLE",
-      allowNull: false
+      allowNull: false,
+      field: "product_price",
     },
-    product_old_price: {
+    productOldPrice: {
       type: "DOUBLE",
-      allowNull: false
+      allowNull: false,
+      field: "product_old_price",
     },
-    short_description: {
+    productDescription: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: false,
+      field: "product_description",
     },
-    full_description: {
+   
+    imageCover : {
       type: DataTypes.TEXT,
-      allowNull: false
-    },
-    small_image: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    medium_image: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    large_image: {
-      type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: false,
+      field: "image_cover",
     },
     isActive: {
       type: DataTypes.INTEGER(4),
-      allowNull: false
+      allowNull: false,
+      field: "is_active",
     }
   })
 
   Product.associate = (models) => {
     Product.belongsTo(models.User)
-  }
-
-  Product.associate = (models) => {
     Product.belongsTo(models.Category)
   }
+
 
   
 

@@ -1,4 +1,4 @@
-import { createServer } from "https";
+import { createServer } from "http";
 import { readFileSync } from "fs";
 import app from "./app"
 import models from "./models";
@@ -14,10 +14,11 @@ const options = {
 models.sequelize.authenticate()
 .then(() => {
     console.log("Connected to the database engine")
-    models.sequelize.sync({ force: true})
+    models.sequelize.sync({ })
     .then(context => {
-        const server = createServer(options, app);
-        server.listen(3000, () => { console.log(`Listening on port ${server.address().port}`)})
+        //const server = createServer(options, app);
+        const server = createServer(app);
+        server.listen(3001, () => { console.log(`Listening on port ${server.address().port}`)})
     })
 }).catch(err => {
     console.log(err)

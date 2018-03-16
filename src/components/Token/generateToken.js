@@ -6,11 +6,10 @@ export default (payload) => {
     const bufferedSecretKey = new Buffer(secretKey, "base64")
     const options = {
         algorithm: "HS256",
-        expiresIn: ms("2 days"),
+        expiresIn: "2 days",
         audience: "https://bsushopping.com",
         issuer: "https://bsushopping.com"
     }
     
-
     return jwt.sign(payload, bufferedSecretKey, options)
 }

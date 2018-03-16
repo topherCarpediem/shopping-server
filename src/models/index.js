@@ -3,7 +3,7 @@ import Sequelize from "sequelize";
 const sequelize = new Sequelize(
     "shopping",
     "root",
-    "101230",
+    "",
     {
         host: "127.0.0.1",
         dialect: "mysql",

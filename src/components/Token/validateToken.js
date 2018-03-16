@@ -7,11 +7,26 @@ export default (token) => {
         algorithm: "HS256",
         audience: "https://bsushopping.com",
         issuer: "https://bsushopping.com",
-        
+
+    }
+
+
+    let result = {
+        type: "",
+        data: {}
     }
 
     jwt.verify(token, bufferedSecretKey, options, (err, decoded) => {
-        console.log(err)
-        console.log(decoded)
+        if(err === null){
+            result.type = "authenticated"
+            result.data = {...decoded}
+        }
+        else {
+            result.type = "unauthorized"
+            result.data = { message: err.message}
+        }
     })
+
+    console.log(result)
+    return result
 }
