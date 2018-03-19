@@ -1,19 +1,19 @@
 import fs from "fs";
 import path from "path";
 import os from "os"
-
-import multer from "multer";
-import { Router } from "express";
-import model from "../../models";
-import { validateToken } from "../Token";
 import bodyParser from "body-parser"
+import multer from "multer";
+import model from "../../models";
+import { Router } from "express";
+import { tokenMiddleware } from "../Token";
+
 
 const { Product } = model
 
 const upload = multer({ dest: 'uploads/' })
 const Products = Router();
 
-Products.use(tokenValidation)
+//Products.use(tokenMiddleware)
 Products.use(bodyParser.json())
 Products.use(bodyParser.urlencoded({ extended: false }))
 
@@ -171,54 +171,32 @@ Products.get("/page/:pagenumber", (req, res) => {
 // ======================================================
 Products.get("/images/:imagename", (req, res) => {
 
-    let filePath = path.join(process.cwd(), `uploads\\${req.params.imagename}`)
+    let filePath = path.join(process.cwd(), `uploads/${req.params.imagename}`)
     const myReadStream = fs.createReadStream(filePath)
 
     myReadStream.on("error", error => {
         console.log("Returning invalid image because image not found")
-        filePath = path.join(process.cwd(), `src\\images\\error.PNG`)
+        filePath = path.join(process.cwd(), `src/images/error.PNG`)
         fs.createReadStream(filePath).pipe(res)
     })
-
+    res.setHeader("Content-type", "image/png")
     myReadStream.pipe(res)
 })
 
 
-// ======================================================
-// * * * * Middleware that handles authentication * * * *
-// ======================================================
-function tokenValidation(req, res, next) {
-    let validationResult = null
-    let authHeader = null
 
-    try {
-        authHeader = req.headers.authorization.split(" ")
-        if (authHeader.length != 2 || authHeader[0] != "Bearer") {
-            res.setHeader('Content-Type', 'application/json')
-            res.status(401).end(JSON.stringify({
-                message: "Unauthorized request",
-                reason: "The format of the token is invalid. Please use Bearer token"
-            }))
-        } else {
-            validationResult = validateToken(authHeader[1])
-            if (validationResult.type === "unauthorized") {
-                res.setHeader('Content-Type', 'application/json')
-                res.status(401).end(JSON.stringify({
-                    message: "Unauthorized request",
-                    reason: validationResult.data.message
-                }))
-            } else {
-                req.id = validationResult.data.id
-                next()
-            }
-        }
-    } catch (error) {
-        res.setHeader('Content-Type', 'application/json')
-        res.status(401).end(JSON.stringify({
-            message: "Unauthorized request",
-            reason: "Unable to detect the authorization token"
-        }))
-    }
-}
 
 export default Products
+
+
+
+
+
+// 1. Android Studio
+// 2. Java Sdk
+// 3. Android Sdk
+// 4. NodeJs
+// 5. VsCode(text editor lang to)
+// 6. Watchman
+// 7. MySql database engine(Kahit intsall na lang yung xampp e ok yun)
+// 8. Postman
