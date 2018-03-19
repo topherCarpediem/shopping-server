@@ -27,6 +27,6 @@ export default (token) => {
         }
     })
 
-    console.log(result)
+    //console.log(result)
     return result
 }

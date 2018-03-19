@@ -21,7 +21,6 @@ export default (sequelize, DataTypes) => {
     },
     productOldPrice: {
       type: "DOUBLE",
-      allowNull: false,
       field: "product_old_price",
     },
     productDescription: {
@@ -34,6 +33,10 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false,
       field: "image_cover",
+    },
+    stocks: {
+      type : DataTypes.INTEGER,
+      allowNull: false
     },
     isActive: {
       type: DataTypes.INTEGER(4),
