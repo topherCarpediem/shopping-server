@@ -2,6 +2,7 @@ import express from "express";
 
 import { userAPI } from "./components/User";
 import { cartAPI } from "./components/Cart";
+import { orderAPI } from "./components/Order";
 import productAPI from "./components/Product/ProductAPI"
 
 
@@ -11,6 +12,7 @@ const app = express()
 
 app.use('/user', userAPI)
 app.use('/cart', cartAPI)
+app.use('/order', orderAPI)
 app.use('/product', productAPI)
 
 export default app;

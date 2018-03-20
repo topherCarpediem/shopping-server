@@ -3,7 +3,7 @@ import Sequelize from "sequelize";
 const sequelize = new Sequelize(
     "shopping",
     "root",
-    "101230",
+    "",
     {
         host: "127.0.0.1",
         dialect: "mysql",
@@ -19,7 +19,7 @@ const sequelize = new Sequelize(
 
 const models = {
     User: sequelize.import('./users'),
-    UserDetails: sequelize.import('./userDetails'),
+    
     Product: sequelize.import('./product'),
     Category: sequelize.import('./category'),
     Cart: sequelize.import('./cart'),

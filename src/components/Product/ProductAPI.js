@@ -119,11 +119,11 @@ Products.delete("/delete/:productId", (req, res) => {
             id: productId
         }
     }).then(result => {
-        if(result === 0){
+        if (result === 0) {
             res.status(404).end(JSON.stringify({
                 message: "Product did not exist. No item deleted"
             }))
-        }else {
+        } else {
             res.status(200).end(JSON.stringify({
                 message: "Successfully deleted the product"
             }))

@@ -28,9 +28,5 @@ export default (sequelize, DataTypes) => {
     }
   })
 
-  User.associate = (models) => {
-    User.hasOne(models.UserDetails)
-  }
-
   return User;
 };
