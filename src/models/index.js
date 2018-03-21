@@ -19,10 +19,12 @@ const sequelize = new Sequelize(
 
 const models = {
     User: sequelize.import('./users'),
-    
+    Order: sequelize.import('./order'),
+    StockTrail: sequelize.import('./stocksTrail'),
     Product: sequelize.import('./product'),
     Category: sequelize.import('./category'),
     Cart: sequelize.import('./cart'),
+    Feedback: sequelize.import('./feedback'),
 }
 
 Object.keys(models).forEach(modelName => {

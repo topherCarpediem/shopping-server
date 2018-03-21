@@ -7,22 +7,33 @@ export default (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         allowNull: false
       },
+      quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
       orderStatus: {
-        type: DataTypes.BOOLEAN,
+        type: DataTypes.STRING,
+        field: "order_status",
         allowNull: false
       },
       orderType: {
+        field: "order_type",
         type: DataTypes.STRING,
         allowNull: false
       },
+      
       orderShippingAddress: {
+        field: "order_shipping_address",
         type: DataTypes.STRING,
         allowNull: false
       }
     })
-  
-    return Order
-  
     
+    Order.associate = (models) => {
+      Order.belongsTo(models.User)
+      Order.belongsTo(models.Product)
+    }
+
+    return Order    
   };
   

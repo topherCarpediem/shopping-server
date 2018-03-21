@@ -13,7 +13,7 @@ const { Product } = model
 const upload = multer({ dest: 'uploads/' })
 const Products = Router();
 
-//Products.use(tokenMiddleware)
+Products.use(tokenMiddleware)
 Products.use(bodyParser.json())
 Products.use(bodyParser.urlencoded({ extended: false }))
 
@@ -32,7 +32,7 @@ Products.post("/add", upload.single('avatar'), (req, res) => {
         stocks: req.body.stocks,
         productDescription: req.body.productDescription,
         imageCover: `${req.file.filename}.png`,
-        isActive: true,
+        isActive: false,
         user_id: req.id
     }
 

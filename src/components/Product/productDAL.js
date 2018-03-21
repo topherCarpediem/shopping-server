@@ -1,18 +1,18 @@
 import model from "../../models";
 
-const { Product } = model
+const { Product, StockTrail } = model
 
 
 async function addProduct(params) {
     const productDetails = {
         productName: params.productName,
-        productPrice: params.productPrice ,
+        productPrice: params.productPrice,
         productOldPrice: params.productOldPrice,
         productDescription: params.productDescription,
         imageCover: params.imageCover,
         isActive: params.isActive
     }
-    
+
     Product.create()
 }
 
@@ -22,7 +22,7 @@ function updateStocks(params) {
 
     return Product.find({
         where: {
-            id: productId
+            id: productId,
         }
     }).then(result => {
         if (result === null) {
@@ -34,13 +34,20 @@ function updateStocks(params) {
         }
         return dataValues
     }).then(productDetails => {
-        return Product.update({
-            stocks: productDetails.stocks - quantity
-        }, {
+
+        return StockTrail.create({
+            currentStock: productDetails.stocks,
+            out: quantity,
+            product_id: productId
+        }).then(stocks => {
+            return Product.update({
+                stocks: productDetails.stocks - quantity
+            }, {
                 where: {
-                    id: productId
+                    id: productId,
                 }
             })
+        })
     })
 }
 

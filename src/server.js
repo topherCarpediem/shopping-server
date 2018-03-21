@@ -14,7 +14,7 @@ const options = {
 models.sequelize.authenticate()
 .then(() => {
     console.log("Connected to the database engine")
-    models.sequelize.sync({  })
+    models.sequelize.sync({   })
     .then(context => {
         //const server = createServer(options, app);
         const server = createServer(app);
