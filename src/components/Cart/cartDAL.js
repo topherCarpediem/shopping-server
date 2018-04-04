@@ -79,6 +79,19 @@ async function isItemExistInCart(params) {
     return isExist
 }
 
+async function getAll(params){
+    const { userId } = params
+
+    const cartQuery = await Cart.findAll({
+        include: [{
+            model: Product,
+            required: true
+        }]
+    })
+
+    return cartQuery
+}
+
 async function isProductExist(params) {
     const isExist = await Product.count({
         where: {
@@ -90,4 +103,4 @@ async function isProductExist(params) {
 }
 
 
-export { addItem, updateItem, removeItem, isItemExistInCart, isProductExist }
+export { addItem, updateItem, removeItem, isItemExistInCart, isProductExist, getAll }

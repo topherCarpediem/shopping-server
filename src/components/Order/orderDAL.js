@@ -1,23 +1,46 @@
 import models from "../../models";
 
-const { Order } = models
+const { Order, Product } = models
 
 
 async function checkout(params) {
-    const orderDetails = {
-        quantity: params.quantity,
-        orderStatus: params.orderStatus,
-        orderType: params.orderType,
-        orderShippingAddress: params.orderShippingAddress,
-        user_id: params.user_id,
-        product_id: params.product_id
-    }
-    const orderCreated = await Order.create({
-        ...orderDetails
+    
+    const orderCreated = await Order.bulkCreate(params)
+    return orderCreated
+    
+}
+
+async function purchases(id){
+    const orders = await Order.findAll({
+        where: {
+            user_id : id
+        },
+        order: [
+            ['created_at', 'DESC']
+        ],
+        include: [{
+            model: Product,
+            required: true
+        }]
     })
 
-    return orderCreated
+    return orders
+}
+
+async function order({ orderId, userId}){
+    const order = await Order.find({
+        where: {
+            user_id: userId,
+            id: orderId
+        },
+        include: [{
+            model: Product,
+            required: true
+        }]
+    })
+
+    return order
 }
 
 
-export { checkout }
+export { checkout, purchases, order }

@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import { tokenMiddleware } from "../../components/Token";
 
 import { updateStocks } from "../Product";
-import { checkout } from "./orderDAL";
+import { checkout, purchases, order } from "./orderDAL";
 
 const Order = Router()
 
@@ -12,35 +12,146 @@ Order.use(tokenMiddleware)
 Order.use(bodyParser.json())
 Order.use(bodyParser.urlencoded({ extended: false }))
 
-Order.post("/checkout/:productId", (req, res) => {
-    const { productId } = req.params
-    const { quantity } = req.body
+Order.post("/checkout", (req, res) => {
+    //const { productId } = req.params
+
+    let productDetailsBody = null
+    let errorInSchemma = false
+    const { productDetails } = req.body
+
+    try {
+        productDetailsBody = JSON.parse(productDetails)
+
+        if (typeof productDetailsBody === "string") {
+            productDetailsBody = JSON.parse(productDetailsBody)
+        }
+
+    } catch (error) {
+
+        res.setHeader("Content-type", "application/json")
+        res.status(400).end(JSON.stringify({
+            message: "Unable to parse the data in the body"
+        }))
+
+        return res
+
+    }
+
+
+    for (let index = 0; index < productDetailsBody.length; index++) {
+        const element = productDetailsBody[index];
+        if (typeof element.id === "undefined" || typeof element.quantity === "undefined") {
+            errorInSchemma = true
+            break;
+        }
+
+    }
+
+    if (errorInSchemma) {
+        res.setHeader("Content-type", "application/json")
+        res.status(400).end(JSON.stringify({
+            message: "Schema of the parameter is invalid"
+        }))
+        return res
+    }
+
+    //console.log(productDetailsBody)
 
     updateStocks({
-        productId: productId,
-        quantity: quantity
+        productDetails: productDetailsBody,
     }).then(result => {
-        console.log(result)
-        // insert query to order table
-        return checkout({
-            quantity: quantity,
-            orderStatus: "Processing",
-            orderType: "COD",
-            orderShippingAddress: "Tanauan Batangas",
-            user_id: req.id,
-            product_id: productId
-        })
-    }).then(checkouted => {
+        //console.log(result)
+        const temp = []
+        productDetailsBody.forEach(element => {
+            temp.push({
+                quantity: element.quantity,
+                orderStatus: "Processing",
+                orderType: "COD",
+                orderShippingAddress: "Tanauan Batangas",
+                user_id: req.id,
+                product_id: element.id,
+                created_at: new Date(),
+                updated_at: new Date()
+            })
+        });
+
+        return checkout(temp)
+
+    }).then(checkedout => {
+        console.log('checked out')
+        console.log(checkedout)
+
         res.setHeader("Content-type", "application/json")
         res.status(200).end(JSON.stringify({
-            message: "Order is in process"
+            message: "Order(s) processing"
         }))
     }).catch(err => {
         handleError(err.message, res)
     })
+
 })
 
 
+Order.get('/purchases', (req, res) => {
+    const id = req.id
+
+    purchases(id).then(result => {
+        //console.log(result)
+        const orders = result.map(order => {
+            order.dataValues.product.imageCover = `${__imageLink}${order.dataValues.product.imageCover}`
+            return order.dataValues
+        })
+
+        res.setHeader("Content-type", "application/json")
+        res.status(200).end(JSON.stringify(orders))
+
+        return
+
+    }).catch(err => {
+        console.log(err)
+    })
+
+})
+
+
+Order.get('/:orderId', (req, res) => {
+    const userId = req.id
+    const { orderId } = req.params
+    //console.log(userId)
+    //console.log(req.params)
+
+    if (typeof orderId === 'undefined') {
+        res.setHeader("Content-type", "application/json")
+        res.status(400).end(JSON.stringify({
+            message: "Order id cannot be null"
+        }))
+        return
+    }
+
+    order({ userId, orderId }).then(result => {
+        
+        if(result === null){
+            throw new Error("OrderNotFoundError")
+        }
+
+        result.dataValues.product.imageCover = `${__imageLink}${result.dataValues.product.imageCover}`
+        const orderQuery = result.dataValues
+
+        res.setHeader("Content-type", "application/json")
+        res.status(200).end(JSON.stringify(orderQuery))
+        return
+
+    }).catch(err => {
+
+        res.setHeader("Content-type", "application/json")
+        res.status(400).end(JSON.stringify({
+            message: err.message
+        }))
+        return
+
+    })
+
+})
 
 function handleError(err, res) {
     switch (err) {

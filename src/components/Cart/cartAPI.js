@@ -1,6 +1,6 @@
 import { Router } from "express"
 import bodyParser from "body-parser";
-import { addItem, updateItem, removeItem } from "./cartDAL";
+import { addItem, updateItem, removeItem, getAll } from "./cartDAL";
 import { tokenMiddleware } from "../Token";
 
 const Cart = Router()
@@ -66,6 +66,25 @@ Cart.put("/update/:productId", (req, res) => {
         })
 })
 
+
+Cart.get("/all", (req, res) => {
+    getAll({ userId: req.id }).then(result => {
+        
+        const dataValues = result.map(cart => {
+            cart.dataValues.product.imageCover = `${__imageLink}${cart.dataValues.product.imageCover}`
+            return cart.dataValues
+        })
+        res.setHeader("Content-type", "application/json")
+        res.status(200).end(JSON.stringify(dataValues))
+        return res
+    }).catch(err => {
+        res.setHeader("Content-type", "application/json")
+        res.status(400).end(JSON.stringify({
+            message: err.message
+        }))
+        return res
+    })
+})
 
 
 // ======================================================

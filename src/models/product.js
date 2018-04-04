@@ -24,7 +24,7 @@ export default (sequelize, DataTypes) => {
       field: "product_old_price",
     },
     productDescription: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.TEXT,
       allowNull: false,
       field: "product_description",
     },

@@ -1,5 +1,7 @@
 import model from "../../models";
 
+const { Op } = model.Sequelize
+
 const { Product, StockTrail } = model
 
 
@@ -18,35 +20,73 @@ async function addProduct(params) {
 
 
 function updateStocks(params) {
-    const { quantity, productId } = params
+    const { productDetails } = params
+    //console.log(productDetails)
+    const productIds = productDetails.map(product => product.id)
 
-    return Product.find({
+    return Product.findAll({
         where: {
-            id: productId,
+            id: {
+                [Op.or]: productIds
+            }
         }
     }).then(result => {
-        if (result === null) {
+        if (result.length === 0) {
             throw new Error("ProductNotExistError")
         }
-        const { dataValues } = result
-        if (dataValues.stocks < quantity) {
-            throw new Error("OrderGreaterThanStocksError")
-        }
-        return dataValues
-    }).then(productDetails => {
+        const products = result.map(product => {
+            return product.dataValues
+        })
 
-        return StockTrail.create({
-            currentStock: productDetails.stocks,
-            out: quantity,
-            product_id: productId
-        }).then(stocks => {
-            return Product.update({
-                stocks: productDetails.stocks - quantity
-            }, {
-                where: {
-                    id: productId,
+        products.forEach(product => {
+            productDetails.forEach(prod => {
+                if (product.id === prod.id) {
+                    if (product.stocks < prod.quantity) {
+                        throw new Error("OrderGreaterThanStocksError")
+                    }
                 }
             })
+        })
+
+        return products
+
+    }).then(products => {
+
+        
+        let setters = ''
+        let condition = ''
+
+        const temp = []
+
+        products.forEach(product => {
+            productDetails.forEach(prod => {
+                if (product.id === prod.id) {
+
+                    setters += `WHEN '${product.id}' THEN ${product.stocks - prod.quantity} `
+                    condition += `'${product.id}',`
+
+                    temp.push({
+                        currentStock: product.stocks,
+                        out: prod.quantity,
+                        product_id: product.id,
+                        created_at: new Date(),
+                        updated_at: new Date()
+                    })
+                }
+            })
+        })
+
+        const rawQuery = `
+        UPDATE products  
+        SET stocks = CASE id 
+        ${setters} 
+        END 
+        WHERE id IN (${condition.slice(0, -1)})`
+
+        
+        return StockTrail.bulkCreate(temp).then(result => {
+            //console.log(result)
+            return model.sequelize.query(rawQuery)
         })
     })
 }

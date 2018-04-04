@@ -8,12 +8,12 @@ import { Router } from "express";
 import { tokenMiddleware } from "../Token";
 
 
-const { Product } = model
+const { Product, Tag } = model
 
 const upload = multer({ dest: 'uploads/' })
 const Products = Router();
 
-Products.use(tokenMiddleware)
+//Products.use(tokenMiddleware)
 Products.use(bodyParser.json())
 Products.use(bodyParser.urlencoded({ extended: false }))
 
@@ -21,38 +21,69 @@ Products.use(bodyParser.urlencoded({ extended: false }))
 // ======================================================
 // * * * * * * Add products to the database * * * * * * *
 // ======================================================
-Products.post("/add", upload.single('avatar'), (req, res) => {
+Products.post("/add", tokenMiddleware, upload.single('avatar'), (req, res) => {
 
-    let old = path.join(process.cwd(), req.file.path)
-    fs.renameSync(old, old + ".png")
+
+    try {
+        let old = path.join(process.cwd(), req.file.path)
+        fs.renameSync(old, old + ".png")
+    } catch (error) {
+        res.setHeader("Content-type", "application/json")
+        res.status(400).end(JSON.stringify({ message: "Cannot find the image in the request" }))
+        return res
+    }
 
     const productDetails = {
         productName: req.body.productName,
-        productPrice: req.body.productPrice,
+        productPrice: parseFloat(req.body.productPrice).toFixed(2),
         stocks: req.body.stocks,
         productDescription: req.body.productDescription,
         imageCover: `${req.file.filename}.png`,
-        isActive: false,
-        user_id: req.id
+        isActive: 1,
+        user_id: req.id,
+        category_id: req.body.categoryId
     }
 
+    const reqTags = JSON.parse(req.body.tags)
+
     Product.create(productDetails).then(result => {
-        res.setHeader("Content-type", "application/json")
-        res.status(200).end(JSON.stringify(result.dataValues))
+
+        const tags = reqTags.map(tag => {
+            const tagName = tag.replace("#", "")
+            return {
+                tagName,
+                product_id: result.dataValues.id,
+                created_at: new Date(),
+                updated_at: new Date()
+            }
+        })
+
+        //console.log(tags)
+
+        Tag.bulkCreate(tags).then(tagResult => {
+            res.setHeader("Content-type", "application/json")
+            res.status(200).end(JSON.stringify(result.dataValues))
+        }).catch(err => {
+            res.setHeader("Content-type", "application/json")
+            res.status(400).end(JSON.stringify({ message: err.message }))
+        })
+
     }).catch(err => {
         res.setHeader("Content-type", "application/json")
-        res.status(200).end(JSON.stringify({ message: err.message }))
+        res.status(400).end(JSON.stringify({ message: err.message }))
     })
+
+    //console.log(productDetails)
 })
 
 // ======================================================
 //  * * * * * * * * Edit product details. * * * * * * * *
 // ======================================================
-Products.put("/edit/:productId", (req, res) => {
+Products.put("/edit/:productId", tokenMiddleware, (req, res) => {
 
     let productDetails = {}
     const { productName, productPrice, stocks, productDescription, isActive } = req.body
-
+    //console.log(req.body)
     if (productName !== undefined)
         productDetails.productName = productName
     if (productPrice !== undefined)
@@ -109,7 +140,7 @@ Products.put("/edit/:productId", (req, res) => {
 // ======================================================
 //  * * * * * * * * Delete product * * * * * * * *
 // ======================================================
-Products.delete("/delete/:productId", (req, res) => {
+Products.delete("/delete/:productId", tokenMiddleware, (req, res) => {
     res.setHeader("Content-type", "application/json")
 
     const { productId } = req.params
@@ -125,7 +156,7 @@ Products.delete("/delete/:productId", (req, res) => {
             }))
         } else {
             res.status(200).end(JSON.stringify({
-                message: "Successfully deleted the product"
+                message: "SuccessfCreating SDD for Socket serverully deleted the product"
             }))
         }
     })
@@ -154,6 +185,8 @@ Products.get("/page/:pagenumber", (req, res) => {
             }
             res.setHeader("Content-type", "application/json")
             res.status(404).end(JSON.stringify(dataValues))
+
+            return res
         } else {
             dataValues = result.map(productItem => {
                 productItem.dataValues.imageCover = `${__imageLink}${productItem.dataValues.imageCover}`
@@ -161,6 +194,47 @@ Products.get("/page/:pagenumber", (req, res) => {
             });
             res.setHeader("Content-type", "application/json")
             res.status(200).end(JSON.stringify(dataValues))
+
+            return res
+        }
+    })
+})
+
+Products.get("/seller", tokenMiddleware, (req, res) => {
+    //const { pagenumber } = req.params
+    //const pageOffset = pagenumber > 1 ? pagenumber * 20 : 0
+
+    Product.findAll({
+        where: {
+            user_id: req.id
+        },
+        order: [
+            ['created_at', 'DESC'],
+        ],
+        // offset: pageOffset,
+        // limit: 20,
+    }).then(result => {
+
+        let dataValues = null
+
+        if (result.length === 0) {
+            dataValues = {
+                message: "Page not found."
+            }
+            res.setHeader("Content-type", "application/json")
+            res.status(404).end(JSON.stringify(dataValues))
+
+            return res
+
+        } else {
+            dataValues = result.map(productItem => {
+                productItem.dataValues.imageCover = `${__imageLink}${productItem.dataValues.imageCover}`
+                return productItem.dataValues
+            });
+            res.setHeader("Content-type", "application/json")
+            res.status(200).end(JSON.stringify(dataValues))
+
+            return res
         }
     })
 })
@@ -184,6 +258,45 @@ Products.get("/images/:imagename", (req, res) => {
 })
 
 
+Products.get("/:productId", (req, res) => {
+
+    const { productId } = req.params
+
+    Product.find({
+        where: {
+            id: productId
+        }
+    }).then(result => {
+
+        let dataValues = null
+
+        if (result.length === 0) {
+            dataValues = {
+                message: "Product not found."
+            }
+            res.setHeader("Content-type", "application/json")
+            res.status(404).end(JSON.stringify(dataValues))
+
+            return
+
+        } else {
+
+            result.dataValues.imageCover = `${__imageLink}${result.dataValues.imageCover}`
+            res.setHeader("Content-type", "application/json")
+            res.status(200).end(JSON.stringify(result.dataValues))
+            //console.log(result.dataValues)
+            return
+        }
+
+    }).catch(err => {
+        //console.log(err)
+        res.setHeader("Content-type", "application/json")
+        res.status(400).end(JSON.stringify({
+            message: err.message
+        }))
+    })
+
+})
 
 
 export default Products

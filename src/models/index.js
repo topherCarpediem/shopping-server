@@ -3,15 +3,16 @@ import Sequelize from "sequelize";
 const sequelize = new Sequelize(
     "shopping",
     "root",
-    "",
+    "101230",
     {
         host: "127.0.0.1",
         dialect: "mysql",
         dialectOptions: {
-            encrypt: true
+            encrypt: true,
+            decimalNumbers: true
         },
         define: {
-            underscored: true
+            underscored: true 
         },
         operatorsAliases: false
     },
@@ -22,6 +23,8 @@ const models = {
     Order: sequelize.import('./order'),
     StockTrail: sequelize.import('./stocksTrail'),
     Product: sequelize.import('./product'),
+    ProductFeature: sequelize.import('./productFeature'),
+    Tag: sequelize.import('./tag'),
     Category: sequelize.import('./category'),
     Cart: sequelize.import('./cart'),
     Feedback: sequelize.import('./feedback'),

@@ -12,14 +12,14 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: false
     },
-    description: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    header: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
+    // description: {
+    //   type: DataTypes.STRING(255),
+    //   allowNull: false
+    // },
+    // header: {
+    //   type: DataTypes.STRING(255),
+    //   allowNull: true
+    // },
     parentCategory: {
       type: DataTypes.INTEGER(11),
       allowNull: true
