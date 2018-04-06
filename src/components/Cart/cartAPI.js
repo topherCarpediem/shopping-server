@@ -69,7 +69,7 @@ Cart.put("/update/:productId", (req, res) => {
 
 Cart.get("/all", (req, res) => {
     getAll({ userId: req.id }).then(result => {
-        
+
         const dataValues = result.map(cart => {
             cart.dataValues.product.imageCover = `${__imageLink}${cart.dataValues.product.imageCover}`
             return cart.dataValues
@@ -133,7 +133,6 @@ function handleError(err, res) {
             }))
             break;
 
-
         case "ProductNotExistError":
             res.setHeader("Content-type", "application/json")
             res.status(400).end(JSON.stringify({
@@ -145,6 +144,13 @@ function handleError(err, res) {
             res.status(400).end(JSON.stringify({
                 message: "The item is not exist in the cart"
             }))
+
+        case "OwnItemError":
+            res.setHeader("Content-type", "application/json")
+            res.status(400).end(JSON.stringify({
+                message: "Cannot add your own item to cart!"
+            }))
+            
         default:
             break;
     }

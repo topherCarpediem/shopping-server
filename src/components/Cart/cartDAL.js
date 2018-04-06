@@ -8,6 +8,8 @@ const { Cart, Product } = model
 async function addItem(params) {
     const isProduct = await isProductExist({ product_id: params.product_id })
 
+    
+    
     if (isProduct === 0) {
         throw new Error("ProductNotExistError")
     }
@@ -16,9 +18,21 @@ async function addItem(params) {
     if (isExist !== 0) {
         throw new Error("ItemExistInCartError")
     } else {
+        
+        const product = await Product.find({
+            where: {
+                id: params.product_id
+            }
+        })
+    
+        if(product.dataValues.user_id === params.user_id){
+            throw new Error("OwnItemError")
+        }
+        
         const createdItem = await Cart.create({ ...params })
         return createdItem
     }
+    
 }
 
 // ======================================================
@@ -27,6 +41,7 @@ async function addItem(params) {
 async function updateItem(params) {
     const { productId, quantity, userId } = params
     const isExist = await isItemExistInCart({ product_id: productId })
+
     if (isExist === 0) {
         throw new Error("ItemNotExistInCartError")
     } else {

@@ -3,8 +3,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import bodyParser from "body-parser";
 
-import { isUserExist, createUser, verifyUser } from "./userDAL";
-import { generateToken } from "../Token";
+import { isUserExist, createUser, verifyUser, profile } from "./userDAL";
+import { generateToken, tokenMiddleware } from "../Token";
 
 
 const User = Router();
@@ -64,6 +64,11 @@ User.post('/login', sanitizeLoginBody, (req, res) => {
         })
 })
 
+User.get('/profile', tokenMiddleware, (req, res) => {
+    profile(req.id).then(result => {
+        console.log(result)
+    })
+})
 
 // Gracefully handle errors
 function handleError(err, res) {

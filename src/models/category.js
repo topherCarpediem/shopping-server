@@ -12,6 +12,9 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: false
     },
+    icon: {
+      type: DataTypes.STRING(255)
+    },
     // description: {
     //   type: DataTypes.STRING(255),
     //   allowNull: false

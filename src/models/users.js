@@ -28,5 +28,9 @@ export default (sequelize, DataTypes) => {
     }
   })
 
+  User.associate = (model) => {
+    User.belongsTo(model.Address)
+  }
+
   return User;
 };

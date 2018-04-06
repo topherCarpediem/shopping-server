@@ -8,7 +8,8 @@ import { Router } from "express";
 import { tokenMiddleware } from "../Token";
 
 
-const { Product, Tag } = model
+
+const { Product, Tag, Order } = model
 
 const upload = multer({ dest: 'uploads/' })
 const Products = Router();
@@ -240,6 +241,9 @@ Products.get("/seller", tokenMiddleware, (req, res) => {
 })
 
 
+
+
+
 // ======================================================
 // * * * * * * * * * * Download image * * * * * * * * * *
 // ======================================================
@@ -295,7 +299,41 @@ Products.get("/:productId", (req, res) => {
             message: err.message
         }))
     })
+})
 
+
+Products.get('/recommendation/:productId', (req, res) => {
+    Product.find({
+        where: {
+            id: req.params.productId
+        }
+    }).then(result => {
+        const product = result.dataValues
+        // console.log(product.dataValues)
+        return Product.findAll({
+            where: {
+                category_id: product.category_id
+            }
+        })
+        //console.log(result.dataValues.category_id)
+    }).then(result => {
+        
+        const recommended = []
+
+        result.forEach(product => {
+            if(product.dataValues.id !== req.params.productId){
+                product.dataValues.imageCover = `${__imageLink}${product.dataValues.imageCover}`
+                recommended.push(product.dataValues)
+            }
+        })
+
+        res.setHeader("Content-type", "application/json")
+        res.status(200).end(JSON.stringify(recommended))
+
+        return 
+    }).catch(err => {
+        console.log(err)
+    })
 })
 
 

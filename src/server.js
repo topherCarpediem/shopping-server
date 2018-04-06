@@ -11,19 +11,21 @@ const options = {
     cert: certificate
 }
 
-const categories = ["Men's Clothing",
-    "Women's Clothing",
-    "Shoes and Footwear",
-    "Laptops and Computers",
-    "Mobile Phones and Tablets",
-    "Watches and Jewelries",
-    "Cars and Automotives",
-    "Motorcycles and Motogears",
-    "Bags and Luggages"]
+const categories = [
+    {name: "Men's Clothing", icon: "male"},
+    {name: "Women's Clothing", icon: "female"},
+    {name: "Shoes and Footwear", icon: "foot"},
+    {name: "Laptops and Computers", icon: "computer"},
+    {name: "Mobile Phones and Tablets", icon: "mobile"},
+    {name: "Watches and Jewelries", icon: "watch"},
+    {name: "Cars and Automotives", icon: "car"},
+    {name: "Motorcycles and Motogears", icon: "motorcycle"},
+    {name: "Bags and Luggages", icon: "shopping-bag"}]
 
 const category = categories.map(category => {
     return {
-        name: category,
+        name: category.name,
+        icon: category.icon,
         created_at: new Date(),
         updated_at: new Date()
     }

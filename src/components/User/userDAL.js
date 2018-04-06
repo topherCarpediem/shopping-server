@@ -1,7 +1,7 @@
 import models from "../../models"
 import bcrypt from "bcrypt"
 
-const { User } = models
+const { User, Address } = models
 
 // Find one user with exact emailAddress
 async function isUserExist(emailAddress) {
@@ -15,11 +15,39 @@ async function isUserExist(emailAddress) {
 
 // Insert user in the database
 async function createUser(args) {
-    console.log(args)
-    const userDetails = args
-    userDetails.password = hashPassword(userDetails.password)
-    const userCreation = await User.create(userDetails)
+    //console.log(args)
+    // const userDetails = args
+    // userDetails.password = hashPassword(userDetails.password)
+    // const userCreation = await User.create(userDetails)
+    // return userCreation
+    let { firstName, lastName, emailAddress, password, ...address } = args
+    const addressCreated = await Address.create(address)
+    password = hashPassword(password)
+    const userCreation = await User.create({
+        firstName,
+        lastName,
+        emailAddress,
+        password,
+        address_id: addressCreated.id
+    })
     return userCreation
+    //console.log(addressCreated.dataValues)
+}
+
+async function profile(userId){
+    const profile = await User.find({
+        where: {
+            id: userId
+        },
+        include: [
+            {
+                model: Address,
+                required: true
+            }
+        ]
+    })
+
+    return profile
 }
 
 // Verify if the user exist in the record
@@ -49,4 +77,4 @@ function hashPassword(plainPassword) {
     return bcrypt.hashSync(plainPassword, saltRound)
 }
 
-export { isUserExist, createUser, verifyUser }
+export { isUserExist, createUser, verifyUser, profile }

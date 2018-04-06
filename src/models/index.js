@@ -28,6 +28,7 @@ const models = {
     Category: sequelize.import('./category'),
     Cart: sequelize.import('./cart'),
     Feedback: sequelize.import('./feedback'),
+    Address: sequelize.import('./address')
 }
 
 Object.keys(models).forEach(modelName => {

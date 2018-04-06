@@ -85,6 +85,8 @@ Order.post("/checkout", (req, res) => {
         res.status(200).end(JSON.stringify({
             message: "Order(s) processing"
         }))
+
+        
     }).catch(err => {
         handleError(err.message, res)
     })

@@ -14,7 +14,9 @@ export default (sequelize, DataTypes) => {
     
     Feedback.associate = (models) => {
         Feedback.belongsTo(models.User)
+        Feedback.belongsTo(models.Product)
     }
+    
     return Feedback
   };
   

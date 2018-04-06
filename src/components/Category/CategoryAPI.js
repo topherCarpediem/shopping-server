@@ -10,8 +10,26 @@ Category.get('/', (req, res) => {
             return category.dataValues
         })
         res.setHeader("Content-type", "application/json")
-        res.status(200).end(JSON.stringify(categoryResult))
+        res.status(200).end(JSON.stringify(categoryResult))       
+    })
+})
+
+Category.get('/:categoryId', (req, res) => {
+    
+    const { categoryId } = req.params
+
+    models.Product.findAll({
+        where:{
+            category_id: categoryId
+        }
+    }).then(result => {
+        const categoryResult = result.map(category => {
+            category.dataValues.imageCover = `${__imageLink}${category.dataValues.imageCover}`
+            return category.dataValues
+        })
         
+        res.setHeader("Content-type", "application/json")
+        res.status(200).end(JSON.stringify(categoryResult))    
     })
 })
 
