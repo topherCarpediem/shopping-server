@@ -20,7 +20,7 @@ async function addProduct(params) {
 
 
 function updateStocks(params) {
-    const { productDetails } = params
+    const { productDetails, userId } = params
     //console.log(productDetails)
     const productIds = productDetails.map(product => product.id)
 
@@ -44,6 +44,9 @@ function updateStocks(params) {
                     if (product.stocks < prod.quantity) {
                         throw new Error("OrderGreaterThanStocksError")
                     }
+		    if(product.user_id === userId){
+                        throw new Error("OwnItemError")
+		    }
                 }
             })
         })

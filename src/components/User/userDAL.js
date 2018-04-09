@@ -46,7 +46,7 @@ async function profile(userId){
             }
         ]
     })
-
+    
     return profile
 }
 

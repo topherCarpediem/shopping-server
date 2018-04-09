@@ -317,11 +317,11 @@ Products.get('/recommendation/:productId', (req, res) => {
         })
         //console.log(result.dataValues.category_id)
     }).then(result => {
-        
+
         const recommended = []
 
         result.forEach(product => {
-            if(product.dataValues.id !== req.params.productId){
+            if (product.dataValues.id !== req.params.productId) {
                 product.dataValues.imageCover = `${__imageLink}${product.dataValues.imageCover}`
                 recommended.push(product.dataValues)
             }
@@ -330,10 +330,70 @@ Products.get('/recommendation/:productId', (req, res) => {
         res.setHeader("Content-type", "application/json")
         res.status(200).end(JSON.stringify(recommended))
 
-        return 
+        return
     }).catch(err => {
         console.log(err)
     })
+})
+
+
+Products.get('/order/:orderId', async (req, res) => {
+    const order = await Order.find({
+        where: {
+            id: req.params.orderId
+        },
+        include: [{
+            model: Product,
+            required: true
+        }]
+    })
+
+    //console.log(order)
+
+    order.dataValues.product.dataValues.imageCover = `${__imageLink}${order.dataValues.product.dataValues.imageCover}`
+    //return order.dataValues.product.dataValues
+    res.setHeader("Content-type", "application/json")
+    res.status(200).end(JSON.stringify(order.dataValues))
+    // return 
+
+})
+
+Products.put('/pickup/:orderId', async (req, res) => {
+    const order = await Order.update(
+        {
+            orderStatus: "Shipped"
+        },
+        {
+            where: {
+                id: req.params.orderId
+            }
+        })
+    
+        res.setHeader("Content-type", "application/json")
+        res.status(200).end(JSON.stringify({
+            message: "Pick up the product!"
+        }))
+
+        return
+
+})
+
+Products.put('/deliver/:orderId', async (req, res) => {
+    const order = await Order.update(
+        {
+            orderStatus: "Delivered"
+        },
+        {
+            where: {
+                id: req.params.orderId
+            }
+        })
+    
+        res.setHeader("Content-type", "application/json")
+        res.status(200).end(JSON.stringify({
+            message: "Product delivered!"
+        }))
+
 })
 
 

@@ -13,7 +13,7 @@ export default (sequelize, DataTypes) => {
       barangay: { type: DataTypes.STRING },
       city: { type: DataTypes.STRING },
       province: { type: DataTypes.STRING },
-
+      phoneNumber: { type: DataTypes.STRING }
       
     });
   

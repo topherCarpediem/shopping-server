@@ -42,5 +42,30 @@ async function order({ orderId, userId}){
     return order
 }
 
+async function pickup(userId){
+    const order = await Order.findAll({
+        include: [{
+            model: Product,
+            where: {
+                user_id: userId
+            },
+            required: true
+        }]
+    })
 
-export { checkout, purchases, order }
+    return order
+}
+
+async function checkIfOwnItem(userId, productId){
+    const product = await Product.count({
+	where: {
+	    id: productId,
+	    user_id: userId
+	}
+    })
+
+    return product
+}
+
+
+export { checkout, purchases, order, pickup, checkIfOwnItem }

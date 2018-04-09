@@ -6,15 +6,13 @@ const { Cart, Product } = model
 //  * * * * * * * * Add item to Cart * * * * * * * *
 // ======================================================
 async function addItem(params) {
-    const isProduct = await isProductExist({ product_id: params.product_id })
+    const isProduct = await isProductExist({ product_id: params.product_id, userId: params.user_id })
 
-    
-    
     if (isProduct === 0) {
         throw new Error("ProductNotExistError")
     }
 
-    const isExist = await isItemExistInCart({ product_id: params.product_id })
+    const isExist = await isItemExistInCart({ product_id: params.product_id,  userId: params.user_id })
     if (isExist !== 0) {
         throw new Error("ItemExistInCartError")
     } else {
@@ -87,7 +85,8 @@ async function removeItem(params) {
 async function isItemExistInCart(params) {
     const isExist = await Cart.count({
         where: {
-            product_id: params.product_id
+            product_id: params.product_id,
+            user_id: params.userId
         }
     })
 
@@ -98,6 +97,9 @@ async function getAll(params){
     const { userId } = params
 
     const cartQuery = await Cart.findAll({
+        where: {
+            user_id: userId
+        },
         include: [{
             model: Product,
             required: true
@@ -110,9 +112,10 @@ async function getAll(params){
 async function isProductExist(params) {
     const isExist = await Product.count({
         where: {
-            id: params.product_id
+            id: params.product_id,
         }
     })
+    
 
     return isExist
 }

@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import { tokenMiddleware } from "../../components/Token";
 
 import { updateStocks } from "../Product";
-import { checkout, purchases, order } from "./orderDAL";
+import { checkout, purchases, order, pickup } from "./orderDAL";
 
 const Order = Router()
 
@@ -59,6 +59,7 @@ Order.post("/checkout", (req, res) => {
 
     updateStocks({
         productDetails: productDetailsBody,
+	userId: req.id
     }).then(result => {
         //console.log(result)
         const temp = []
@@ -67,19 +68,18 @@ Order.post("/checkout", (req, res) => {
                 quantity: element.quantity,
                 orderStatus: "Processing",
                 orderType: "COD",
-                orderShippingAddress: "Tanauan Batangas",
+                orderShippingAddress: element.shippingAddress,
                 user_id: req.id,
                 product_id: element.id,
                 created_at: new Date(),
                 updated_at: new Date()
             })
         });
-
+        
         return checkout(temp)
 
     }).then(checkedout => {
         console.log('checked out')
-        console.log(checkedout)
 
         res.setHeader("Content-type", "application/json")
         res.status(200).end(JSON.stringify({
@@ -104,8 +104,35 @@ Order.get('/purchases', (req, res) => {
             return order.dataValues
         })
 
+        //console.log(orders)
         res.setHeader("Content-type", "application/json")
         res.status(200).end(JSON.stringify(orders))
+
+        return
+
+    }).catch(err => {
+        console.log(err)
+    })
+
+})
+
+Order.get('/pickup', (req, res) => {
+    const id = req.id
+
+    pickup(id).then(result => {
+        //console.log(result)
+        // const orders = result.map(order => {
+        //     order.dataValues.product.imageCover = `${__imageLink}${order.dataValues.product.imageCover}`
+        //     return order.dataValues
+        // })
+        const  productOrdered = result.map(order => {
+            order.dataValues.product.dataValues.imageCover = `${__imageLink}${order.dataValues.product.dataValues.imageCover}`
+            //return order.dataValues.product.dataValues
+            return order.dataValues
+        })
+        console.log(productOrdered)
+        res.setHeader("Content-type", "application/json")
+        res.status(200).end(JSON.stringify(productOrdered))
 
         return
 
@@ -170,6 +197,13 @@ function handleError(err, res) {
             res.setHeader("Content-type", "application/json")
             res.status(404).end(JSON.stringify({
                 message: "Product does not exist"
+            }))
+
+	case "OwnItemError":
+
+            res.setHeader("Content-type", "application/json")
+            res.status(404).end(JSON.stringify({
+                message: "Cannot purchase your own item"
             }))
         default:
             break;

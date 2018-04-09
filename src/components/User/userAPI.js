@@ -66,7 +66,9 @@ User.post('/login', sanitizeLoginBody, (req, res) => {
 
 User.get('/profile', tokenMiddleware, (req, res) => {
     profile(req.id).then(result => {
-        console.log(result)
+        sendResponse(res, { message: result.dataValues })
+    }).catch(err => {
+        console.log(err)
     })
 })
 
