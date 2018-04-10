@@ -38,7 +38,7 @@ models.sequelize.authenticate()
             .then(context => {
                 //const server = createServer(options, app);
                 // models.Category.bulkCreate(category).then(result => {
-                //     console.log(result)
+                //    console.log(result)
                 // })
                 const server = createServer(app);
                 server.listen(3001, () => { console.log(`Listening on port ${server.address().port}`) })

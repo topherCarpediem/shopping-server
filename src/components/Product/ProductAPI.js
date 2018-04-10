@@ -9,7 +9,7 @@ import { tokenMiddleware } from "../Token";
 
 
 
-const { Product, Tag, Order } = model
+const { Product, Tag, Order, User } = model
 
 const upload = multer({ dest: 'uploads/' })
 const Products = Router();
@@ -269,7 +269,11 @@ Products.get("/:productId", (req, res) => {
     Product.find({
         where: {
             id: productId
-        }
+        },
+	include:[{
+	    model: User,
+	    required: true
+	}]
     }).then(result => {
 
         let dataValues = null
