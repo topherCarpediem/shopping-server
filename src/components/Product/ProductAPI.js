@@ -9,7 +9,7 @@ import { tokenMiddleware } from "../Token";
 
 
 
-const { Product, Tag, Order, User } = model
+const { Product, Tag, Order, User, Address, ProductFeature } = model
 
 const upload = multer({ dest: 'uploads/' })
 const Products = Router();
@@ -46,6 +46,7 @@ Products.post("/add", tokenMiddleware, upload.single('avatar'), (req, res) => {
     }
 
     const reqTags = JSON.parse(req.body.tags)
+    const reqFeatures = JSON.parse(req.body.features)
 
     Product.create(productDetails).then(result => {
 
@@ -59,9 +60,21 @@ Products.post("/add", tokenMiddleware, upload.single('avatar'), (req, res) => {
             }
         })
 
+        const productFeature = JSON.parse(req.body.features).map(feature => {
+            return {
+                featureName: feature.name,
+                featureValue: feature.value,
+                created_at: new Date(),
+                updated_at: new Date(),
+                product_id: result.dataValues.id
+            }
+        })
+
         //console.log(tags)
 
         Tag.bulkCreate(tags).then(tagResult => {
+            return ProductFeature.bulkCreate(productFeature)
+        }).then(feature => {
             res.setHeader("Content-type", "application/json")
             res.status(200).end(JSON.stringify(result.dataValues))
         }).catch(err => {
@@ -272,7 +285,11 @@ Products.get("/:productId", (req, res) => {
         },
 	include:[{
 	    model: User,
-	    required: true
+        required: true,
+        include: [{
+            model: Address,
+            required: true
+        }]
 	}]
     }).then(result => {
 

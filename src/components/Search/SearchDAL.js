@@ -1,6 +1,6 @@
 import model from "../../models";
 
-const { Product } = model
+const { Product, ProductFeature } = model
 const { Op } = model.Sequelize
 
 async function search(keyword) {
@@ -10,7 +10,10 @@ async function search(keyword) {
             productName: {
                 [Op.like]: `%${keyword}%`
             }
-        }
+        },
+        include: [{
+            model: ProductFeature
+        }]
     })
 
     return productSearch   

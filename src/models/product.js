@@ -48,6 +48,7 @@ export default (sequelize, DataTypes) => {
   Product.associate = (models) => {
     Product.belongsTo(models.User)
     Product.belongsTo(models.Category)
+    Product.hasMany(models.ProductFeature)
   }
 
 

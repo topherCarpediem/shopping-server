@@ -13,15 +13,15 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         field: 'feature_name'
       },
-      featureDescription : {
+      featureValue : {
         type: DataTypes.STRING,
-        field: 'feature_description'
+        field: 'feature_value'
       }
     })
   
-    ProductFeature.associate = (models) => {
-        ProductFeature.belongsTo(models.Product)
-    }
+    // ProductFeature.associate = (models) => {
+    //     ProductFeature.belongsTo(models.Product)
+    // }
 
     return ProductFeature
   };

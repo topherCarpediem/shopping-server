@@ -9,9 +9,9 @@ import feedbackAPI from "./components/Feedback/Feedback"
 import { SearchAPI } from "./components/Search";
 import Chat from "./components/Chat/Chat";
 
-//global.__imageLink = "http://10.24.202.102:3001/product/images/";
+global.__imageLink = "http://192.168.8.100:3001/product/images/";
 //global.__imageLink = "http://192.168.8.103:3001/product/images/";
-global.__imageLink = "http://10.24.120.15:3001/product/images/";
+//global.__imageLink = "http://192.168.8.101:3001/product/images/";
 
 
 const app = express()
