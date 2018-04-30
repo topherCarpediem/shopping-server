@@ -39,7 +39,7 @@ Cart.put("/update/:productId", (req, res) => {
     const { productId } = req.params
     const { quantity } = req.body
     const userId = req.id
-
+    
     const cartContext = {
         productId: productId,
         quantity: quantity,
@@ -93,12 +93,13 @@ Cart.get("/all", (req, res) => {
 Cart.delete("/delete/:productId", (req, res) => {
 
     const { productId } = req.params
+    
     const userId = req.id
     const cartContext = {
         productId: productId,
         userId: userId
     }
-
+    console.log("============================",req.id)
     removeItem(cartContext)
         .then(result => {
 
@@ -149,6 +150,12 @@ function handleError(err, res) {
             res.setHeader("Content-type", "application/json")
             res.status(400).end(JSON.stringify({
                 message: "Cannot add your own item to cart!"
+            }))
+        
+        case "OutOfStockError":
+            res.setHeader("Content-type", "application/json")
+            res.status(400).end(JSON.stringify({
+                message: "Out of stock. Cannot add to the cart"
             }))
             
         default:

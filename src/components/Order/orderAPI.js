@@ -7,6 +7,8 @@ import { updateStocks } from "../Product";
 import { checkout, purchases, order, pickup } from "./orderDAL";
 
 const Order = Router()
+const { Cart } = model
+const { Op } = model.Sequelize
 
 Order.use(tokenMiddleware)
 Order.use(bodyParser.json())
@@ -59,14 +61,14 @@ Order.post("/checkout", (req, res) => {
 
     updateStocks({
         productDetails: productDetailsBody,
-	userId: req.id
+	    userId: req.id
     }).then(result => {
         //console.log(result)
         const temp = []
         productDetailsBody.forEach(element => {
             temp.push({
                 quantity: element.quantity,
-                orderStatus: "Processing",
+                orderStatus: "Pending",
                 orderType: "COD",
                 orderShippingAddress: element.shippingAddress,
                 user_id: req.id,
@@ -86,7 +88,21 @@ Order.post("/checkout", (req, res) => {
             message: "Order(s) processing"
         }))
 
-        
+        const prod = productDetailsBody.map(product => product.id)
+
+        Cart.destroy({
+            where:{
+                product_id: {
+                    [Op.or]: prod
+                },
+                user_id: req.id
+            }
+        }).then(cart => {
+
+        }).catch(err => {
+
+        })
+
     }).catch(err => {
         handleError(err.message, res)
     })

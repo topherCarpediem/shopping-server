@@ -1,5 +1,5 @@
 import models from "../../models";
-
+const { Op } = models.Sequelize;
 const { Order, Product } = models
 
 
@@ -13,7 +13,10 @@ async function checkout(params) {
 async function purchases(id){
     const orders = await Order.findAll({
         where: {
-            user_id : id
+            user_id : id,
+            orderStatus: {
+                [Op.not]: "Pending"
+            }
         },
         order: [
             ['created_at', 'DESC']

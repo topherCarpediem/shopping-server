@@ -22,7 +22,11 @@ async function addItem(params) {
                 id: params.product_id
             }
         })
-    
+
+        if(product.dataValues.stocks === 0){
+            throw new Error("OutOfStockError")
+        }
+        
         if(product.dataValues.user_id === params.user_id){
             throw new Error("OwnItemError")
         }
@@ -63,13 +67,15 @@ async function updateItem(params) {
 // ======================================================
 async function removeItem(params) {
     const { productId, userId } = params
-    const isExist = await isItemExistInCart({ product_id: productId })
+    
+    const isExist = await isItemExistInCart({ product_id: productId, userId: userId })
     if (isExist === 0) {
         throw new Error("ItemNotExistInCartError")
     } else {
         const cartDeletion = await Cart.destroy(
             {
                 where: {
+                    
                     product_id: productId,
                     user_id: userId
                 }
