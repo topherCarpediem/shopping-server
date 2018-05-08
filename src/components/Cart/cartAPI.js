@@ -26,6 +26,7 @@ Cart.post("/add", (req, res) => {
         res.status(200).end(JSON.stringify({
             message: "Successfully added to the cart"
         }))
+        return
     }).catch(err => {
         handleError(err.message, res)
     })
@@ -139,24 +140,28 @@ function handleError(err, res) {
             res.status(400).end(JSON.stringify({
                 message: "Product not exist"
             }))
+            break
 
         case "ItemNotExistInCartError":
             res.setHeader("Content-type", "application/json")
             res.status(400).end(JSON.stringify({
                 message: "The item is not exist in the cart"
             }))
+            break
 
         case "OwnItemError":
             res.setHeader("Content-type", "application/json")
             res.status(400).end(JSON.stringify({
                 message: "Cannot add your own item to cart!"
             }))
+            break
         
         case "OutOfStockError":
             res.setHeader("Content-type", "application/json")
             res.status(400).end(JSON.stringify({
                 message: "Out of stock. Cannot add to the cart"
             }))
+            break
             
         default:
             break;

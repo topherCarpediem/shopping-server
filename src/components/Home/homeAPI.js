@@ -1,15 +1,57 @@
 import { Router } from "express";
 import models from "../../models";
+import QRCode from "qrcode";
 
 const { Order } = models
 const Home = Router();
 
 
 Home.get('/index', (req, res) => {
-
-
     res.render('home')
+})
 
+
+Home.get('/order-details', (req, res) => {
+    res.render('processing')
+})
+
+Home.get('/print/:orderId', (req, res) => {
+    Order.find({
+        where: {
+            id: req.params.orderId
+        },
+        include: [{
+            model: models.Product,
+            required: true,
+        }, {
+            model: models.User,
+            required: true,
+            include: [{
+                model: models.Address,
+                required: true
+            }]
+        }],
+    }).then(result => {
+
+        //res.setHeader("Content-type", "application/json")
+
+        if (result !== null) {
+            result.dataValues.product.dataValues.imageCover = `${__imageLink}${result.dataValues.product.dataValues.imageCover}`
+            const { password, ...userDetails } = result.dataValues.user.dataValues
+            result.dataValues.user.dataValues = userDetails
+            
+            QRCode.toDataURL(req.params.orderId, {
+                width: 300,
+                height: 300
+            }).then(url => {
+                result.dataValues.qrcode = url
+                res.render('print', {data: result.dataValues })
+            }).catch(err => {
+                console.error(err)
+            })
+        }
+        //console.log(result)
+    })
 
 })
 
@@ -19,6 +61,49 @@ Home.get('/orders', (req, res) => {
     Order.findAll({
         where: {
             orderStatus: "Pending"
+        },
+        include: [{
+            model: models.Product,
+            required: true,
+            include: [{
+                model: models.User,
+                required: true
+            }]
+        }, {
+            model: models.User,
+            required: true
+        }]
+    }).then(result => {
+
+        const dataValues = result.map(order => {
+            // order.dataValues.product.dataValues.imageCover = `${__imageLink}${order.dataValues.product.dataValues.imageCover}`
+            // return order.dataValues
+            return [
+                order.id,
+                order.product.productName,
+                "&#8369;" + order.product.productPrice.toFixed(2),
+                order.product.stocks,
+                `${order.user.firstName} ${order.user.lastName}`,
+                `${order.product.user.firstName} ${order.product.user.lastName}`,
+            ]
+
+        });
+        
+        res.setHeader('Content-type', 'application/json')
+        res.status(200).end(JSON.stringify({ data: dataValues }))
+        return
+    }).catch(err => {
+        console.log(err)
+    })
+
+})
+
+
+Home.get('/orders/processing', (req, res) => {
+
+    Order.findAll({
+        where: {
+            orderStatus: "Processing"
         },
         include: [{
             model: models.Product,
@@ -82,7 +167,7 @@ Home.get('/order/:orderId', (req, res) => [
             result.dataValues.product.dataValues.imageCover = `${__imageLink}${result.dataValues.product.dataValues.imageCover}`
             const { password, ...userDetails } = result.dataValues.user.dataValues
             result.dataValues.user.dataValues = userDetails
-            
+
             res.status(200).end(JSON.stringify(result))
             return
         }
@@ -95,7 +180,7 @@ Home.get('/order/:orderId', (req, res) => [
 
 Home.put('/order/:orderId', (req, res) => {
 
-    Order.update({ orderStatus: "Processing"}, {
+    Order.update({ orderStatus: "Processing" }, {
         where: {
             id: req.params.orderId
         }

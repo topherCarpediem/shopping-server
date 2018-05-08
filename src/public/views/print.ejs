@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Print</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+</head>
+<body>
+
+    <img src="<%= data.qrcode %>"></img>
+    <p>Product name: <%= data.product.productName %></p>
+    <p>Price: <%= data.product.productPrice %></p>
+    <p>Quantity:  <%= data.quantity %> </p>
+    <p>Address: <%= data.orderShippingAddress %> </p>
+    <p>Phone number: <%= data.user.address.phoneNumber %></p>
+
+    <button onclick="window.print()">Print</button>
+    <script>
+    </script>
+</body>
+</html>

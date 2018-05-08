@@ -12,8 +12,8 @@ import Chat from "./components/Chat/Chat";
 import Home from "./components/Home/homeAPI"
 
 //global.__imageLink = "http://10.24.202.0:3001/product/images/";
-global.__imageLink = "http://10.24.202.111:3001/product/images/";
-//global.__imageLink = "http://192.168.8.101:3001/product/images/";
+//global.__imageLink = "http://10.24.202.113:3001/product/images/";
+global.__imageLink = "http://192.168.8.101:3001/product/images/";
 
 
 const app = express()
