@@ -1,65 +1,60 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('product', {
-    product_id: {
-      type: DataTypes.INTEGER(11),
+export default (sequelize, DataTypes) => {
+  
+  const Product =  sequelize.define('product', {  
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false
+    },
+    productName: {
+      type: DataTypes.STRING(255),
       allowNull: false,
-      primaryKey: true
+      field: "product_name",
     },
-    product_name: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    product_price: {
+    productPrice: {
       type: "DOUBLE",
-      allowNull: false
+      allowNull: false,
+      field: "product_price",
     },
-    product_old_price: {
+    productOldPrice: {
       type: "DOUBLE",
-      allowNull: false
+      field: "product_old_price",
     },
-    short_description: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    full_description: {
+    productDescription: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: false,
+      field: "product_description",
     },
-    small_image: {
-      type: DataTypes.STRING(255),
-      allowNull: false
+   
+    imageCover : {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      field: "image_cover",
     },
-    medium_image: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    large_image: {
-      type: DataTypes.STRING(255),
+    stocks: {
+      type : DataTypes.INTEGER,
       allowNull: false
     },
     isActive: {
       type: DataTypes.INTEGER(4),
-      allowNull: false
-    },
-    category_id: {
-      type: DataTypes.INTEGER(11),
       allowNull: false,
-      references: {
-        model: 'category',
-        key: 'category_id'
-      }
-    },
-    user_id: {
-      type: DataTypes.INTEGER(11),
-      allowNull: false,
-      references: {
-        model: 'users',
-        key: 'user_id'
-      }
+      field: "is_active",
     }
-  }, {
-    tableName: 'product'
-  });
+  })
+
+  Product.associate = (models) => {
+    Product.belongsTo(models.User)
+    Product.belongsTo(models.Category)
+    Product.hasMany(models.ProductFeature)
+  }
+
+
+  
+
+  return Product
+
+  
 };

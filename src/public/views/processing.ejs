@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Order Details</title>
+    <!-- <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"> -->
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.css">
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
+
+</head>
+
+<body>
+    <br>
+    <h2 id="title" style="text-align: center">Print Order Details</h1>
+
+        <table id="myTable" class="table table-striped table-bordered" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>OrderId</th>
+                    <th>ProductName</th>
+                    <th>ProductPrice</th>
+                    <th>ProductStocks</th>
+                    <th>Buyer</th>
+                    <th>Seller</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>OrderId</th>
+                    <th>ProductName</th>
+                    <th>ProductPrice</th>
+                    <th>ProductStocks</th>
+                    <th>Buyer</th>
+                    <th>Seller</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Order details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <img id="imageCover" src="#" style="width: 100%;">
+                        <h4 id="productName"></h4>
+                        <h4 id="productPrice"></h4>
+                        <h4 id="quantity"></h4>
+                        <h4 id="emailAddress"></h4>
+                        <h4 id="phoneNumber"></h4>
+                        <h4 id="orderStatus"></h4>
+                        <h4 id="orderType"></h4>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="order-approve">Print Order Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <script src="/public/js/jquery-3.2.1.min.js"></script>
+<script src="/public/js/datatables.min.js"></script> -->
+
+
+        <script src="//code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
+        <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+        <script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+
+        <script>
+            let currentOrderId = null
+            let currentRow = null
+
+            $(document).ready(function () {
+
+                fetch('/home/orders/processing')
+                    .then(data => data.json())
+                    .then(result => {
+                        console.log(result)
+                        loadDataTable(result)
+                    })
+
+            });
+
+
+
+            function loadDataTable(result) {
+                var table = null
+                table = $('#myTable').DataTable({
+                    "data": result.data,
+                    "columnDefs": [{
+                        "targets": -1,
+                        "data": null,
+                        "defaultContent": "<button id='review' class='btn btn-primary' data-toggle='modal' data-target='#exampleModal'>Review!</button>"
+                    }]
+                });
+
+                $("#myTable tbody").on("click", "#review", function () {
+                    const data = table.row($(this).parents('tr')).data()
+                    currentOrderId = data[0]
+                    currentRow = table.row($(this).parents('tr'))
+                    const buyer = data[4]
+                    let stocks = data[3]
+                    let address = null
+                    let orderCount = null
+                    let emailAddress = null
+                    let phoneNumber = null
+                    let orderStatus = null
+                    let orderType = null
+                    let imageCover = null
+
+                    //alert(data[0])
+
+                    fetch(`/home/order/${data[0]}`).then(result => {
+                        return result.json()
+                    }).then(result => {
+                        address = result.orderShippingAddress
+                        orderCount = result.quantity
+                        emailAddress = result.user.emailAddress
+                        phoneNumber = result.user.address.phoneNumber
+                        orderStatus = result.orderStatus
+                        orderType = result.orderType
+                        imageCover = result.product.imageCover
+
+                        $("#imageCover").attr("src", imageCover)
+                        $("#productName").text(`Product name: ${data[1]}`)
+                        $("#productPrice").html(`Price: ${data[2]}`)
+                        $("#quantity").text(`Quantity: ${orderCount}`)
+                        $("#emailAddress").text(`Email Address: ${emailAddress}`)
+                        $("#phoneNumber").text(`Phone number: ${phoneNumber}`)
+                        $("#orderStatus").text(`Order Status: ${orderStatus}`)
+                        $("#orderType").text(`Order type: ${orderType}`)
+                    })
+                })
+
+                $("#myTable tbody").on("click", "#approve", function () {
+                    var data = table.row($(this).parents('tr')).data()
+                    alert(data[0])
+                })
+            }
+
+            $("#order-approve").on("click", function(){
+
+                const base_url = window.location.origin;
+                window.open(`${base_url}/home/print/${currentOrderId}`, "Print","heigth=500,width=500");
+
+                
+
+                
+
+                //$("#exampleModal").modal("hide")
+                // fetch(`/home/order/${currentOrderId}`, {
+                //     method: "PUT"
+                // }).then(result => result.json())
+                // .then(result => {
+                    
+                //     $("#exampleModal").modal("hide")
+                //     alert("Order is processing...")
+                    
+                //     if(currentRow !== null){
+                //         currentRow.remove().draw()
+                //     }
+
+                // }).catch(err => {
+                //     console.log(err)
+                // })
+
+            })
+
+            
+        </script>
+</body>
+
+</html>

@@ -3,8 +3,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import bodyParser from "body-parser";
 
-import { isUserExist, createUser, verifyUser } from "./userDAL";
-import { generateToken } from "../Token";
+import { isUserExist, createUser, verifyUser, profile } from "./userDAL";
+import { generateToken, tokenMiddleware } from "../Token";
 
 
 const User = Router();
@@ -19,7 +19,6 @@ User.post('/register', sanitizeRegisterBody, async (req, res) => {
     const emailAddress = req.body.emailAddress;
 
     isUserExist(emailAddress).then(result => {
-
         return result === null ? true : false
     }).then(isUnique => {
         if (!isUnique) {
@@ -65,6 +64,13 @@ User.post('/login', sanitizeLoginBody, (req, res) => {
         })
 })
 
+User.get('/profile', tokenMiddleware, (req, res) => {
+    profile(req.id).then(result => {
+        sendResponse(res, { message: result.dataValues })
+    }).catch(err => {
+        console.log(err)
+    })
+})
 
 // Gracefully handle errors
 function handleError(err, res) {

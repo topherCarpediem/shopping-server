@@ -3,15 +3,16 @@ import Sequelize from "sequelize";
 const sequelize = new Sequelize(
     "shopping",
     "root",
-    "",
+    "101230",
     {
         host: "127.0.0.1",
         dialect: "mysql",
         dialectOptions: {
-            encrypt: true
+            encrypt: true,
+            decimalNumbers: true
         },
         define: {
-            underscored: true
+            underscored: true 
         },
         operatorsAliases: false
     },
@@ -19,10 +20,18 @@ const sequelize = new Sequelize(
 
 const models = {
     User: sequelize.import('./users'),
-    // UserAddress: sequelize.import('./useraddress'),
-    // Product: sequelize.import('./product'),
-    // Category: sequelize.import('./category'),
-    // Cart: sequelize.import('./cart'),
+    Order: sequelize.import('./order'),
+    StockTrail: sequelize.import('./stocksTrail'),
+    Product: sequelize.import('./product'),
+    ProductFeature: sequelize.import('./productFeature'),
+    Tag: sequelize.import('./tag'),
+    Category: sequelize.import('./category'),
+    Cart: sequelize.import('./cart'),
+    Feedback: sequelize.import('./feedback'),
+    Address: sequelize.import('./address'),
+    Room: sequelize.import('./room'),
+    Member: sequelize.import('./member'),
+    Conversation: sequelize.import('./conversation'),
 }
 
 Object.keys(models).forEach(modelName => {

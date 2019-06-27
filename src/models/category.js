@@ -1,29 +1,33 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('category', {
-    category_id: {
-      type: DataTypes.INTEGER(11),
-      allowNull: false,
-      primaryKey: true
+export default (sequelize, DataTypes) => {
+  const Category = sequelize.define('category', {
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false
     },
     name: {
       type: DataTypes.STRING(255),
       allowNull: false
     },
-    description: {
-      type: DataTypes.STRING(255),
-      allowNull: false
+    icon: {
+      type: DataTypes.STRING(255)
     },
-    header: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
+    // description: {
+    //   type: DataTypes.STRING(255),
+    //   allowNull: false
+    // },
+    // header: {
+    //   type: DataTypes.STRING(255),
+    //   allowNull: true
+    // },
     parentCategory: {
       type: DataTypes.INTEGER(11),
       allowNull: true
     }
-  }, {
-    tableName: 'category'
   });
+
+  return Category
 };
